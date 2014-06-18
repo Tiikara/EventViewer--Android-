@@ -4,14 +4,24 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Scanner;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -21,9 +31,9 @@ public class MainActivity extends ActionBarActivity {
             "    countEvents: 3,\n" +
             "    events:\n" +
             "    [\n" +
-            "      [  48.4808300, 135.0927800, \"Это ходка!!!11\" ],\n" +
-            "      [  49.4808300, 134.0927800, \"Это ходка2!!!11\" ],\n" +
-            "      [  47.4808300, 134.0927800, \"Это ходка3!!!11\" ]\n" +
+            "      [  \"г.Хабаровск, ул. Ленина, 20\", \"Это ходка!!!11\" ],\n" +
+            "      [  \"г.Хабаровск, ул. Истомина, 42\", \"Это ходка2!!!11\" ],\n" +
+            "      [  \"г.Хабаровск, пер. Дзержинского, 21\", \"Это ходка3!!!11\" ]\n" +
             "    ]\n" +
             "}";
 
@@ -59,12 +69,32 @@ public class MainActivity extends ActionBarActivity {
 
             for(int i=0;i<countEvents;i++)
             {
+                dataEvents[i] = new DataEvent();
+
                 JSONArray eventJson = eventsJson.getJSONArray(i);
 
-                dataEvents[i] = new DataEvent();
-                dataEvents[i].x = eventJson.getDouble(0);
-                dataEvents[i].y = eventJson.getDouble(1);
-                dataEvents[i].eventDescr = eventJson.getString(2);
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost("http://maps.google.com/maps/api/geocode/json?address="+ eventJson.getString(0).replace(" ", "%20") +"&sensor=false");
+                try {
+                    HttpResponse response = httpClient.execute(httpPost);
+
+                    String line = "";
+                    String geoHttp = "";
+
+                    BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(response.getEntity().getContent()) );
+
+                    while((line = bufferedReader.readLine()) != null)
+                        geoHttp += line;
+
+                    JSONObject jsonGeo = new JSONObject(geoHttp);
+
+                    JSONObject jsonLocation = jsonGeo.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+
+                    dataEvents[i].x = jsonLocation.getDouble("lat");
+                    dataEvents[i].y = jsonLocation.getDouble("lng");
+                } catch (Exception e) {}
+
+                dataEvents[i].eventDescr = eventJson.getString(1);
             }
         } catch (JSONException e) {
             System.out.println(e.toString());
@@ -83,7 +113,7 @@ public class MainActivity extends ActionBarActivity {
     public void ShowDescr(int id)
     {
         Intent myIntent = new Intent(MainActivity.this, ActivityDescrEvent.class);
-        myIntent.putExtra("descr", dataEvents[id].eventDescr); //Optional parameters
+        myIntent.putExtra("descr", dataEvents[id].eventDescr);
         MainActivity.this.startActivity(myIntent);
     }
 
