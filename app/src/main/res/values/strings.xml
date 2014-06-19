@@ -4,5 +4,6 @@
     <string name="main_app">Просмотр мероприятий</string>
     <string name="action_settings">Настройки</string>
     <string name="descr_activity">Описание мероприятия</string>
+    <string name="loading_markers">Загрузка мероприятий...</string>
 
 </resources>

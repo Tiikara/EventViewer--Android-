@@ -9,4 +9,10 @@
         android:layout_height="fill_parent"
         android:id="@+id/webView" />
 
+    <RelativeLayout
+        android:id="@+id/splash_screen_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+    </RelativeLayout>
+
 </RelativeLayout>

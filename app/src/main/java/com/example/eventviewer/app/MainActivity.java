@@ -1,5 +1,8 @@
 package com.example.eventviewer.app;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.ActionBarActivity;
@@ -37,11 +40,18 @@ public class MainActivity extends ActionBarActivity {
             "}";
 
     private DataEvent dataEvents[];
-
+    Fragment fragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragment = new SplashScreenFragment();
+
+        fragmentTransaction.add(R.id.splash_screen_content, fragment);
+        fragmentTransaction.commit();
 
         setupWebView();
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -107,6 +117,11 @@ public class MainActivity extends ActionBarActivity {
         }
 
         webView.loadUrl("javascript:" + query);
+
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.animator.slide_in_right,R.animator.slide_in_right);
+        fragmentTransaction.remove(fragment);
+        fragmentTransaction.commit();
     }
 
     public void ShowDescr(int id)
