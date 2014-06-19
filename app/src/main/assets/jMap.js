@@ -1,29 +1,16 @@
-function SMarker(x, y, id)
-{
-    this.x = x;
-    this.y = y;
-    this.id = id;
-    this.googleMarker = new google.maps.Marker({
-        position: new google.maps.LatLng(x, y),
-        title:"Hello World!"
-    });
-}
-
-var markers = new Array(1000);
-var markerCount = 0;
 
 var map;
 
 function addMarker(x,y, id)
 {
-    markers[markerCount] = new SMarker(x,y, id);
-    markers[markerCount].googleMarker.setMap(map);
+    var marker = new google.maps.Marker({
+                               position: new google.maps.LatLng(x, y),
+                               map: map
+                           });
     
-    google.maps.event.addListener(markers[markerCount].googleMarker, 'click', function() {
+    google.maps.event.addListener(marker, 'click', function() {
         Android.ShowDescr(id);
   });
-    
-    markerCount++;
 }
 
   function initialize() {

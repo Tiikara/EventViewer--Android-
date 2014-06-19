@@ -16,7 +16,7 @@ public class ActivityDescrEvent extends ActionBarActivity {
 
         Intent intent = getIntent();
         String descr = intent.getStringExtra("descr");
-        TextView descrText = (TextView)findViewById(R.id.textView);
+        TextView descrText = (TextView)findViewById(R.id.textViewDescr);
         descrText.setText(descr);
     }
 

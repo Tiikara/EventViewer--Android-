@@ -28,7 +28,6 @@ public class MainActivity extends ActionBarActivity {
     private WebView webView;
 
     private String testJson = "{\n" +
-            "    countEvents: 3,\n" +
             "    events:\n" +
             "    [\n" +
             "      [  \"г.Хабаровск, ул. Ленина, 20\", \"Это ходка!!!11\" ],\n" +
@@ -61,13 +60,11 @@ public class MainActivity extends ActionBarActivity {
         try {
             JSONObject jsonMain = new JSONObject(testJson);
 
-            int countEvents = jsonMain.getInt("countEvents");
-
-            dataEvents = new DataEvent[countEvents];
-
             JSONArray eventsJson = jsonMain.getJSONArray("events");
 
-            for(int i=0;i<countEvents;i++)
+            dataEvents = new DataEvent[eventsJson.length()];
+
+            for(int i=0;i<eventsJson.length();i++)
             {
                 dataEvents[i] = new DataEvent();
 
@@ -79,16 +76,18 @@ public class MainActivity extends ActionBarActivity {
                     HttpResponse response = httpClient.execute(httpPost);
 
                     String line = "";
-                    String geoHttp = "";
+                    String recieveMsg = "";
 
                     BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(response.getEntity().getContent()) );
 
                     while((line = bufferedReader.readLine()) != null)
-                        geoHttp += line;
+                        recieveMsg += line;
 
-                    JSONObject jsonGeo = new JSONObject(geoHttp);
+                    JSONObject jsonGeo = new JSONObject(recieveMsg);
 
-                    JSONObject jsonLocation = jsonGeo.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                    JSONObject jsonLocation = jsonGeo.getJSONArray("results").getJSONObject(0)
+                            .getJSONObject("geometry")
+                            .getJSONObject("location");
 
                     dataEvents[i].x = jsonLocation.getDouble("lat");
                     dataEvents[i].y = jsonLocation.getDouble("lng");
@@ -112,9 +111,9 @@ public class MainActivity extends ActionBarActivity {
 
     public void ShowDescr(int id)
     {
-        Intent myIntent = new Intent(MainActivity.this, ActivityDescrEvent.class);
-        myIntent.putExtra("descr", dataEvents[id].eventDescr);
-        MainActivity.this.startActivity(myIntent);
+        Intent intentDescr = new Intent(MainActivity.this, ActivityDescrEvent.class);
+        intentDescr.putExtra("descr", dataEvents[id].eventDescr);
+        MainActivity.this.startActivity(intentDescr);
     }
 
     @Override
